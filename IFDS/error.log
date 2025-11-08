@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/yoonhyejun/Desktop/Android/Code/IFDS/main.py", line 15, in <module>
+    from solver.IFDSSolver import IFDSSolver
+  File "/Users/yoonhyejun/Desktop/Android/Code/IFDS/solver/IFDSSolver.py", line 7, in <module>
+    from .EdgeIdentity import EdgeIdentity
+  File "/Users/yoonhyejun/Desktop/Android/Code/IFDS/solver/EdgeIdentity.py", line 14, in <module>
+    from .AllBottom import AllBottom
+  File "/Users/yoonhyejun/Desktop/Android/Code/IFDS/solver/AllBottom.py", line 3, in <module>
+    from .EdgeIdentity import EdgeIdentity
+ImportError: cannot import name 'EdgeIdentity' from partially initialized module 'solver.EdgeIdentity' (most likely due to a circular import) (/Users/yoonhyejun/Desktop/Android/Code/IFDS/solver/EdgeIdentity.py)

@@ -1,0 +1,24 @@
+# -*- coding: utf-8 -*-
+"""Developer notes on summary generation.
+
+The original notes are preserved below for reference and grepping.
+"""
+
+class SummaryNotes:
+    """Tiny holder for summary-related hints/knobs."""
+    def __init__(self) -> None:
+        self.fixed_methods_identified: bool = False
+        self.fixed_call_sites_identified: bool = False
+
+    def mark_fixed(self) -> None:
+        self.fixed_methods_identified = True
+        self.fixed_call_sites_identified = True
+
+
+ORIGINAL_NOTES = (
+    "1.) determine fixed methods and fixed call sites\n"
+    "2.) summarize fixed methods; special care needs to be taken if they are in an SCC\n"
+    "3.) summarize information at fixed call sites within non-fixed methods\n"
+    "4.) find a good way to store summaries\n"
+    "5.) find a way to take summaries into account on next run"
+)

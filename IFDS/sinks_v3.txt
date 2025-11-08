@@ -1,0 +1,168 @@
+# ===================================================================
+# SINKS (merged v3)
+# - v2 우선, fixed에서 누락 보충, 필수 패턴 추가
+# ===================================================================
+
+# ===================================================================
+# SINKS (HARD SINKS ONLY — 실제 I/O 지점)
+# ===================================================================
+
+# ---- File I/O (생성자; File/String 둘 다) ----
+re:^Ljava/io/FileOutputStream;-><init>\(Ljava/io/File;.*\)V$
+re:^Ljava/io/FileOutputStream;-><init>\(Ljava/lang/String;.*\)V$
+
+re:^Ljava/io/FileInputStream;-><init>\(Ljava/io/File;.*\)V$
+re:^Ljava/io/FileInputStream;-><init>\(Ljava/lang/String;.*\)V$
+
+re:^Ljava/io/FileWriter;-><init>\(Ljava/io/File;.*\)V$
+re:^Ljava/io/FileWriter;-><init>\(Ljava/lang/String;.*\)V$
+
+re:^Ljava/io/FileReader;-><init>\(Ljava/io/File;.*\)V$
+re:^Ljava/io/FileReader;-><init>\(Ljava/lang/String;.*\)V$
+
+re:^Ljava/io/RandomAccessFile;-><init>\(Ljava/io/File;.*\)V$
+re:^Ljava/io/RandomAccessFile;-><init>\(Ljava/lang/String;.*\)V$
+
+
+# ---- Android Context 직통 I/O ----
+re:^Landroid/content/Context;->openFileOutput\(Ljava/lang/String;I\)Ljava/io/FileOutputStream;$
+re:^Landroid/content/Context;->openFileInput\(Ljava/lang/String;\)Ljava/io/FileInputStream;$
+
+# ---- File I/O (메서드) ----
+re:^Ljava/io/OutputStream;->write\(.*\)V$
+re:^Ljava/io/Writer;->write\(.*\)V$
+re:^Ljava/io/Writer;->append\(.*\)Ljava/io/Writer;$
+
+# ---- SQLite / DB / Room ----
+re:^L[^;]+;->open\(Ljava/lang/String;.*\).*$          # openDatabase(String, ...)
+re:^L[^;]+;->openOrCreateDatabase\(Ljava/lang/String;.*\).*$
+
+re:^Landroidx/room/Room;->databaseBuilder\(Landroid/content/Context;Ljava/lang/Class;Ljava/lang/String;\)Landroidx/room/RoomDatabase\$Builder;$
+re:^Landroidx/room/RoomDatabase\$Builder;->build\(\)Landroidx/room/RoomDatabase;$
+
+# ---- SharedPreferences ----
+re:^Landroid/content/SharedPreferences\$Editor;->put(String|Int|Long|Boolean|Float)\(Ljava/lang/String;.*\)Landroid/content/SharedPreferences\$Editor;$
+
+# ---- 대표 캐시 라이브러리 (File 객체를 받는 생성자) ----
+re:^L.*okhttp3.*Cache;-><init>\(Ljava/io/File;J\)V$
+re:^Lcom/google/android/exoplayer2/.*cache/.*Cache;-><init>\(Ljava/io/File;.*J\)V$
+re:^Lcom/bumptech/glide/.*cache/.*;-><init>\(Ljava/io/File;.*\)V$
+re:^L.*coil.*disk.*DiskCache;-><init>\(Ljava/io/File;.*\)V$
+
+# ---- [EXTRA] 필수 패턴 보강 ----
+re:^Ljava/io/File;-><init>\(Ljava/lang/String;\)V$
+re:^Ljava/io/File;-><init>\(Ljava/io/File;Ljava/lang/String;\)V$
+re:^Ljava/io/FileOutputStream;-><init>\(Ljava/lang/String;\).*$
+re:^Ljava/io/FileInputStream;-><init>\(Ljava/lang/String;\).*$
+re:^Ljava/io/RandomAccessFile;-><init>\(Ljava/lang/String;.*\).*$
+re:^Ljava/io/FileOutputStream;-><init>\(Ljava/io/File;.*\).*$
+re:^Ljava/io/FileInputStream;-><init>\(Ljava/io/File;.*\).*$
+re:^Ljava/io/RandomAccessFile;-><init>\(Ljava/io/File;.*\).*$
+re:^Ljava/io/FileWriter;-><init>\(Ljava/io/File;.*\).*$
+re:^Ljava/io/FileReader;-><init>\(Ljava/io/File;.*\).*$
+re:^Landroid/content/Context;->openFileOutput\(Ljava/lang/String;I\)Ljava/io/FileOutputStream;$
+re:^Landroid/content/Context;->openFileInput\(Ljava/lang/String;\)Ljava/io/FileInputStream;$
+re:^Lokhttp3/Cache;-><init>\(Ljava/io/File;J\)V$
+re:^Lcom/google/android/exoplayer2/.*cache.*;-><init>\(Ljava/io/File;.*\).*$
+re:^Lcom/bumptech/glide/.*cache.*;-><init>\(Ljava/io/File;.*\).*$
+re:^Lcoil/.*disk.*DiskCache;-><init>\(Ljava/io/File;.*\).*$
+re:^Landroidx/room/Room;->databaseBuilder\(Landroid/content/Context;Ljava/lang/Class;Ljava/lang/String;\)Landroidx/room/RoomDatabase\$Builder;$
+re:^Landroidx/room/RoomDatabase\$Builder;->build\(\)Landroidx/room/RoomDatabase;$
+re:^Landroid/database/sqlite/SQLiteDatabase;->openOrCreateDatabase\(Ljava/lang/String;.*\).*$
+re:^Landroid/content/SharedPreferences\$Editor;->put(String|Int|Long|Boolean|Float)\(Ljava/lang/String;.*\).*$
+
+# ---- fixed에서 보충 ----
+re:^Ljava/io/OutputStream;->write\((\[B|I|\[BII)\)V$
+re:^Ljava/io/FileOutputStream;->write\((\[B|I|\[BII)\)V$
+re:^Ljava/io/Writer;->(write|append)\((\[C|Ljava/lang/String;|C|Ljava/lang/CharSequence;|\[CII|Ljava/lang/CharSequence;II)\)(V|Ljava/io/Writer;)$
+re:^Ljava/io/OutputStreamWriter;->(write|append)\((\[C|Ljava/lang/String;|C|Ljava/lang/CharSequence;|\[CII|Ljava/lang/CharSequence;II)\)(V|Ljava/io/Writer;)$
+re:^Ljava/io/FileWriter;->(write|append)\((\[C|Ljava/lang/String;|C|Ljava/lang/CharSequence;|\[CII|Ljava/lang/CharSequence;II)\)(V|Ljava/io/Writer;)$
+re:^Ljava/io/BufferedWriter;->(write|append)\((\[C|Ljava/lang/String;|C|Ljava/lang/CharSequence;|\[CII|Ljava/lang/CharSequence;II)\)(V|Ljava/io/Writer;)$
+re:^Ljava/io/PrintWriter;->(print|println|write|append)\(.*\)(V|Ljava/io/PrintWriter;)$
+re:^Ljava/io/RandomAccessFile;->write(UTF|Bytes|Chars|Char|Float|Double|\[B)\(.*\)V$
+re:^Ljava/nio/channels/FileChannel;->write\((Ljava/nio/ByteBuffer;|\[Ljava/nio/ByteBuffer;II|J)\)J$
+re:^Ljava/nio/file/Files;->(newOutputStream|newInputStream|write|readAllBytes)\(.*\).*$
+Ljava/io/File;-><init>(Ljava/lang/String;)V
+Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+Ljava/io/File;-><init>(Ljava/lang/String;Ljava/lang/String;)V
+Ljava/io/FileOutputStream;-><init>(Ljava/lang/String;)V
+Ljava/io/FileOutputStream;-><init>(Ljava/io/File;)V
+Ljava/io/RandomAccessFile;-><init>(Ljava/lang/String;Ljava/lang/String;)V
+Ljava/io/FileInputStream;-><init>(Ljava/lang/String;)V
+Ljava/io/FileInputStream;-><init>(Ljava/io/String;)V
+re:^Ljava/nio/file/Paths;->get\(Ljava/lang/String;(\[Ljava/lang/String;)?\)Ljava/nio/file/Path;$
+Ljava/io/File;->createNewFile()Z
+re:^Landroid/content/ContentResolver;->openInputStream\(Landroid/net/Uri;\)Ljava/io/InputStream;$
+re:^Landroid/content/ContentResolver;->openOutputStream\(Landroid/net/Uri;(Ljava/lang/String;)?\)Ljava/io/OutputStream;$
+re:^Landroid/content/ContentResolver;->openAssetFileDescriptor\(Landroid/net/Uri;Ljava/lang/String;\)Landroid/content/res/AssetFileDescriptor;$
+re:^Landroid/content/ContentResolver;->openFileDescriptor\(Landroid/net/Uri;Ljava/lang/String;\)Landroid/os/ParcelFileDescriptor;$
+re:^Landroidx/core/content/FileProvider;->getUriForFile\(Landroid/content/Context;Ljava/lang/String;Ljava/io/File;\)Landroid/net/Uri;$
+re:^Landroid/content/SharedPreferences\$Editor;->put(Boolean|Float|Int|Long|String|StringSet)\(.*\)Landroid/content/SharedPreferences\$Editor;$
+Landroid/content/SharedPreferences$Editor;->apply()V
+Landroid/content/SharedPreferences$Editor;->commit()Z
+re:^L[^;]+;->getDataDir\(\)Ljava/io/File;$
+re:^L[^;]+;->getFilesDir\(\)Ljava/io/File;$
+re:^L[^;]+;->getCacheDir\(\)Ljava/io/File;$
+re:^L[^;]+;->getNoBackupFilesDir\(\)Ljava/io/File;$
+re:^L[^;]+;->getCodeCacheDir\(\)Ljava/io/File;$
+re:^L[^;]+;->getDir\(Ljava/lang/String;I\)Ljava/io/File;$
+re:^L[^;]+;->getFileStreamPath\(Ljava/lang/String;\)Ljava/io/File;$
+re:^L[^;]+;->openFileOutput\(Ljava/lang/String;I\)Ljava/io/FileOutputStream;$
+re:^L[^;]+;->getExternalFilesDir\(Ljava/lang/String;\)Ljava/io/File;$
+re:^L[^;]+;->getExternalCacheDir\(\)Ljava/io/File;$
+re:^L[^;]+;->getObbDir\(\)Ljava/io/File;$
+Landroid/os/Environment;->getExternalStorageDirectory()Ljava/io/File;
+Landroid/os/Environment;->getExternalStoragePublicDirectory(Ljava/lang/String;)Ljava/io/File;
+re:^L[^;]+;->getDatabasePath\(Ljava/lang/String;\)Ljava/io/File;$
+re:^L[^;]+;->openOrCreateDatabase\(Ljava/lang/String;.*\)Landroid/database/sqlite/SQLiteDatabase;$
+re:^Landroid/database/sqlite/SQLiteDatabase;->openDatabase\(Ljava/lang/String;.*\)Landroid/database/sqlite/SQLiteDatabase;$
+re:^Landroid/database/sqlite/SQLiteDatabase;->openOrCreateDatabase\(Ljava/lang/String;.*\)Landroid/database/sqlite/SQLiteDatabase;$
+re:^Landroid/database/sqlite/SQLiteDatabase;->execSQL\(.*\)V$
+Landroid/database/sqlite/SQLiteDatabase;->insert(Ljava/lang/String;Ljava/lang/String;Landroid/content/ContentValues;)J
+Landroid/database/sqlite/SQLiteDatabase;->insertOrThrow(Ljava/lang/String;Ljava/lang/String;Landroid/content/ContentValues;)J
+re:^Landroid/database/sqlite/SQLiteDatabase;->insertWithOnConflict\(Ljava/lang/String;Ljava/lang/String;Landroid/content/ContentValues;I\)J$
+Landroid/database/sqlite/SQLiteDatabase;->update(Ljava/lang/String;Landroid/content/ContentValues;Ljava/lang/String;[Ljava/lang/String;)I
+Landroid/database/sqlite/SQLiteDatabase;->updateWithOnConflict(Ljava/lang/String;Landroid/content/ContentValues;Ljava/lang/String;[Ljava/lang/String;I)I
+re:^Lnet/sqlcipher/database/SQLiteDatabase;->openDatabase\(Ljava/lang/String;.*\)Lnet/sqlcipher/database/SQLiteDatabase;$
+re:^Lnet/sqlcipher/database/SQLiteDatabase;->openOrCreateDatabase\(Ljava/lang/String;.*\)Lnet/sqlcipher/database/SQLiteDatabase;$
+re:^Lnet/sqlcipher/database/SQLiteDatabase;->execSQL\(.*\)V$
+re:^Landroidx/sqlite/db/SupportSQLiteOpenHelper;->get(Writable|Readable)Database\(\)Landroidx/sqlite/db/SupportSQLiteDatabase;$
+re:^Landroidx/sqlite/db/SupportSQLiteDatabase;->(execSQL|query)\(.*\).*$
+re:^Lokhttp3/OkHttpClient;->newCall\(Lokhttp3/Request;\)Lokhttp3/Call;$
+re:^Lokhttp3/Call;->enqueue\(Lokhttp3/Callback;\)V$
+re:^Lokhttp3/Call;->execute\(\)Lokhttp3/Response;$
+re:^Ljava/net/HttpURLConnection;->connect\(\)V$
+re:^Ljava/net/HttpURLConnection;->getOutputStream\(\)Ljava/io/OutputStream;$
+re:^Ljava/net/HttpURLConnection;->setRequestMethod\(Ljava/lang/String;\)V$
+re:^Lorg/apache/http/client/HttpClient;->execute\(Lorg/apache/http/client/methods/HttpUriRequest;.*\)*
+re:^Lcom/google/firebase/storage/UploadTask;->addOnSuccessListener\(.*\).*$
+re:^Lcom/google/firebase/database/DatabaseReference;->setValue\(.*\).*$  
+re:^Lcom/google/firebase/firestore/DocumentReference;->set\(.*\).*$  
+re:^Lcom/amazonaws/services/s3/AmazonS3Client;->putObject\(.*\).*$ 
+re:^L.+;->directory\(L.+;?\).+
+re:^L.+;->setDirectory\(L.+;?\).+
+re:^L.+;->setDiskCache\(L.+;?\).+
+re:^L.+;->diskCache\(L.+;?\).+
+re:^L.+;->build\(\)L.+;
+re:^L.+;->create\(\)L.+; 
+Landroid/content/Context;->getCacheDir()Ljava/io/File;
+re:->writeFile\(Ljava/lang/String;Ljava/lang/String;\)
+re:->saveToCache\(Ljava/lang/String;.*\)
+re:->writeToCache\(.*\)
+re:->store\(Ljava/lang/String;.*\)
+re:->persist\(.*\)
+re:->diskCache\(.*\)
+re:^L.*okhttp3.*Cache;-><init>\(Ljava/io/File;J\)V$
+re:^Lcom/google/android/exoplayer2/.*cache/.*Cache;-><init>\(Ljava/io/File;.*J\)V$
+re:^Lcom/google/android/exoplayer2/.*cache/SimpleCache;-><init>\(Ljava/io/File;L.*;J\)V$
+re:^L.*glide.*cache.*;-><init>\(Ljava/io/File;.*\)V$
+re:^Lcom/bumptech/glide/.*cache/.*;-><init>\(Ljava/io/File;.*\)V$
+re:^L.*coil.*disk.*DiskCache;-><init>\(Ljava/io/File;.*\)V$
+re:^L.*coil.*cache.*;-><init>\(Ljava/io/File;.*\)V$
+re:^L.*picasso.*cache.*;-><init>\(Ljava/io/File;.*\)V$
+re:^L.*fresco.*cache.*;-><init>\(Ljava/io/File;.*\)V$
+re:^L.*[cC]ache.*;-><init>\(Ljava/io/File;.*\)V$
+re:^L.*[dD]isk.*;-><init>\(Ljava/io/File;.*\)V$
+re:^L.*squareup.*okhttp3.*Cache;-><init>\(Ljava/io/File;J\)V$
+re:^Lokhttp3/.*Cache;-><init>\(Ljava/io/File;J\)V$
+re:^L.*coil.*DiskCache.*;-><init>\(Ljava/io/File;.*\)V$

@@ -1,0 +1,192 @@
+# ===================================================================
+# SOURCES (merged v3)
+# - v2 우선, fixed에서 누락 보충, 필수 패턴 추가
+# ===================================================================
+
+# ---- 내부 앱 디렉터리 (베이스) ----
+re:^L[^;]+;->get(DataDir|getFilesDir|getNoBackupFilesDir|getCacheDir|getCodeCacheDir)\(\)Ljava/io/File;$
+re:^L[^;]+;->getObbDir\(\)Ljava/io/File;$
+re:^L[^;]+;->getObbDirs\(\)\[Ljava/io/File;$
+
+# ---- 외부(앱 전용) 디렉터리 (베이스) ----
+re:^L[^;]+;->getExternalCacheDir\(\)Ljava/io/File;$
+re:^L[^;]+;->getExternalCacheDirs\(\)\[Ljava/io/File;$
+re:^L[^;]+;->getExternalFilesDir\(Ljava/lang/String;\)Ljava/io/File;$
+re:^L[^;]+;->getExternalFilesDirs\(Ljava/lang/String;\)\[Ljava/io/File;$
+
+# ---- 조합형: 인자를 결합하여 곧바로 하위 경로를 리턴 ----
+re:^L[^;]+;->getDir\(Ljava/lang/String;I\)Ljava/io/File;$
+re:^L[^;]+;->getDatabasePath\(Ljava/lang/String;\)Ljava/io/File;$
+re:^L[^;]+;->getFileStreamPath\(Ljava/lang/String;\)Ljava/io/File;$
+
+# ---- Environment 기반 (레거시도 포함) ----
+re:^L[^;]+;->getExternalStorageDirectory()Ljava/io/File;
+re:^L[^;]+;->getDataDirectory()Ljava/io/File;
+re:^L[^;]+;->getDownloadCacheDirectory()Ljava/io/File;
+re:^L[^;]+;->getExternalStoragePublicDirectory\(Ljava/lang/String;\)Ljava/io/File;$
+
+# ---- MediaStore(상대경로 기반) 힌트(RELATIVE_PATH/PRIMARY) ----
+re:^L[^;]+;->getContentUri(Ljava/lang/String;)Landroid/net/Uri;
+re:^L[^;]+;->getContentUri\(.+\)Landroid/net/Uri;$
+
+# ---- 웹뷰/런타임 성격(주로 getDir로 귀결되므로 힌트용) ----
+re:^L[^;]+;->getSharedPreferences\(Ljava/lang/String;I\)Landroid/content/SharedPreferences;$
+re:^Landroid/(webkit|support/v4/webkit|androidx/webkit)/.*$
+
+# ✨ ---- File 생성자도 source로 취급 (다단계 경로 추적용) ----
+re:^Ljava/io/File;-><init>\(Ljava/io/File;Ljava/lang/String;\)V$
+re:^Ljava/io/File;-><init>\(Ljava/lang/String;\)V$
+re:^Ljava/io/File;-><init>\(Ljava/io/File;\)V$
+
+
+# ---- [EXTRA] 필수 패턴 보강 ----
+re:^Ljava/lang/StringBuilder;->append\(Ljava/lang/String;\)Ljava/lang/StringBuilder;$
+re:^Ljava/lang/StringBuilder;->toString\(\)Ljava/lang/String;$
+re:^Ljava/lang/String;->format\(Ljava/lang/String;\[Ljava/lang/Object;\)Ljava/lang/String;$
+re:^Landroid/net/Uri;->parse\(Ljava/lang/String;\)Landroid/net/Uri;$
+re:^Landroid/net/Uri;->getPath\(\)Ljava/lang/String;$
+re:^Landroid/net/Uri;->getLastPathSegment\(\)Ljava/lang/String;$
+re:^Ljava/io/File;->getPath\(\)Ljava/lang/String;$
+re:^Ljava/io/File;->getAbsolutePath\(\)Ljava/lang/String;$
+
+# ---- fixed에서 보충 ----
+re:^Landroid/telephony/cdma/CdmaCellLocation;->get(NetworkId|SystemId|BaseStationId|BaseStationLongitude|BaseStationLatitude)\(\)I$
+re:^Landroid/telephony/CellIdentity(Cdma|Gsm|Lte|Wcdma);->get(Cid|Ci|Lac|Tac|Mcc|Mnc|Pci|Psc)\(\)[IJ]$
+re:^Landroid/telephony/CellInfo(Cdma|Gsm|Lte|Wcdma);->getCellIdentity\(\)Landroid/telephony/CellIdentity.*;$
+re:^Landroid/telephony/NeighboringCellInfo;->get(Cid|Lac|Psc|Rssi)\(\)I$
+re:^Landroid/location/Location;->get(Latitude|Longitude)\(\)D$
+re:^Landroid/location/LocationManager;->getLastKnownLocation\(Ljava/lang/String;\)Landroid/location/Location;$
+re:^Landroid/location/LocationListener;->onLocationChanged\(Landroid/location/Location;\)V$
+re:^Ljava/lang/System;->(currentTimeMillis|nanoTime)\(\)J$
+re:^Ljava/util/Calendar;->getInstance\((Ljava/util/Locale;|Ljava/util/TimeZone;Ljava/util/Locale;|Ljava/util/TimeZone;)?\)Ljava/util/Calendar;$
+re:^Ljava/util/Calendar;->(getTime|getTimeInMillis)\(\)(J|Ljava/util/Date;)$
+re:^Ljava/util/Date;-><init>\(\)V$
+re:^Ljava/util/Date;->get(Date|Day|Hours|Minutes|Month|Seconds|Time|Year)\(\)[IJ]$
+re:^Landroid/widget/EditText;->getText\(\)Landroid/text/Editable;$
+re:^Landroid/widget/TextView;->getEditableText\(\)Landroid/text/Editable;$
+re:^Landroid/webkit/WebResourceRequest;->getUrl\(\)Landroid/net/Uri;$
+re:^Landroid/provider/Browser;->getAll(VisitedUrls|Bookmarks)\(\)Landroid/database/Cursor;$
+re:^Landroid/webkit/WebView;->getUrl\(\)Ljava/lang/String;$
+re:^Landroid/webkit/WebViewClient;->(doUpdateVisitedHistory|onPageFinished|onPageStarted|onLoadResource)\(Landroid/webkit/WebView;Ljava/lang/String;.*\)V$
+re:^Landroid/webkit/WebViewClient;->shouldOverrideUrlLoading\(Landroid/webkit/WebView;Ljava/lang/String;\)Z$
+re:^Landroid/webkit/WebView;->loadUrl\(Ljava/lang/String;\)V$
+Landroid/content/res/Resources;->getString(I)Ljava/lang/String;
+re:^Landroid/content/Intent;->getStringExtra\(Ljava/lang/String;\)Ljava/lang/String;$
+re:^Landroid/os/Bundle;->getString\(Ljava/lang/String;\)Ljava/lang/String;$
+re:^Landroid/content/SharedPreferences;->getString\(Ljava/lang/String;Ljava/lang/String;\)Ljava/lang/String;$
+Ljava/io/File;->getPath()Ljava/lang/String;
+Ljava/io/File;->getAbsolutePath()Ljava/lang/String;
+Landroid/net/Uri;->getPath()Ljava/lang/String;
+Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
+Ljava/lang/String;->format(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+Ljava/net/URL;-><init>\(Ljava/lang/String;\)V
+Landroid/net/Uri;->parse\(Ljava/lang/String;\)Landroid/net/Uri;
+Ljava/lang/String;->contains\(Ljava/lang/CharSequence;\)Z       # optional but helps flag "http"
+Ljava/lang/String;->startsWith\(Ljava/lang/String;\)Z           # detect "http"
+Ljava/lang/StringBuilder;->append\(Ljava/lang/String;\)Ljava/lang/StringBuilder;
+re:^Lokhttp3/Request\$Builder;->url\(Ljava/lang/String;\)Lokhttp3/Request\$Builder;$
+re:^Lokhttp3/Request\$Builder;->url\(Lokhttp3/HttpUrl;\)Lokhttp3/Request\$Builder;$
+re:^Lcom/google/firebase/storage/FirebaseStorage;->getReference\(Ljava/lang/String;\)Lcom/google/firebase/storage/StorageReference;$
+
+# ===================================================================
+# [ADD] 내부 디렉터리/파일 API 보강
+# ===================================================================
+# API 24+: /data/user/0/<pkg>
+re:^Landroid/content/Context;->getDataDir\(\)Ljava/io/File;$
+
+# 내부 파일 스트림 (파일명→실경로로 귀결)
+re:^Landroid/content/Context;->openFileOutput\(Ljava/lang/String;I\)Ljava/io/FileOutputStream;$
+re:^Landroid/content/Context;->openFileInput\(Ljava/lang/String;\)Ljava/io/FileInputStream;$
+
+# 데이터베이스 경로 유도
+re:^Landroid/content/Context;->openOrCreateDatabase\(Ljava/lang/String;I.*\)Landroid/database/sqlite/SQLiteDatabase;$
+re:^Landroid/database/sqlite/SQLiteOpenHelper;->getDatabaseName\(\)Ljava/lang/String;$
+
+# 임시 파일 (dir 인자 사용 시 해당 디렉터리 하위로 생성)
+re:^Ljava/io/File;->createTempFile\(Ljava/lang/String;Ljava/lang/String;Ljava/io/File;\)Ljava/io/File;$
+
+# ===================================================================
+# [ADD] 외부/미디어 디렉터리 보강
+# ===================================================================
+# API 21+: 사진·동영상 등 미디어별 베이스
+re:^Landroid/content/Context;->getExternalMediaDirs\(\)\[Ljava/io/File;$
+
+# (누락 방지) Environment 계열 종결자 보강
+re:^Landroid/os/Environment;->getExternalStorageDirectory\(\)Ljava/io/File;$
+re:^Landroid/os/Environment;->getDataDirectory\(\)Ljava/io/File;$
+re:^Landroid/os/Environment;->getDownloadCacheDirectory\(\)Ljava/io/File;$
+re:^Landroid/os/Environment;->getExternalStoragePublicDirectory\(Ljava/lang/String;\)Ljava/io/File;$
+
+# ===================================================================
+# [ADD] SAF / DocumentsContract / DocumentFile
+# ===================================================================
+Landroid/provider/DocumentsContract;->buildDocumentUri(Ljava/lang/String;Ljava/lang/String;)Landroid/net/Uri;
+Landroid/provider/DocumentsContract;->buildDocumentUriUsingTree(Landroid/net/Uri;Ljava/lang/String;)Landroid/net/Uri;
+Landroid/provider/DocumentsContract;->getDocumentId(Landroid/net/Uri;)Ljava/lang/String;
+Landroid/provider/DocumentsContract;->getTreeDocumentId(Landroid/net/Uri;)Ljava/lang/String;
+Landroidx/documentfile/provider/DocumentFile;->fromTreeUri(Landroid/content/Context;Landroid/net/Uri;)Landroidx/documentfile/provider/DocumentFile;
+Landroidx/documentfile/provider/DocumentFile;->fromSingleUri(Landroid/content/Context;Landroid/net/Uri;)Landroidx/documentfile/provider/DocumentFile;
+Landroidx/documentfile/provider/DocumentFile;->getUri()Landroid/net/Uri;
+Landroidx/documentfile/provider/DocumentFile;->getName()Ljava/lang/String;
+Landroidx/documentfile/provider/DocumentFile;->listFiles()[Landroidx/documentfile/provider/DocumentFile;
+
+# ===================================================================
+# [ADD] ContentResolver / Cursor (RELATIVE_PATH, DISPLAY_NAME 복원)
+# ===================================================================
+re:^Landroid/content/ContentResolver;->(insert|query)\(Landroid/net/Uri;.*\).*$ 
+re:^Landroid/database/Cursor;->getString\(I\)Ljava/lang/String;$
+re:^Landroid/database/Cursor;->getInt\(I\)I$
+re:^Landroid/database/Cursor;->getLong\(I\)J$
+re:^Landroid/database/Cursor;->moveTo(First|Next)\(\)Z$
+re:^Landroid/database/Cursor;->getColumnIndex\(Ljava/lang/String;\)I$
+re:^Landroid/database/Cursor;->getColumnIndexOrThrow\(Ljava/lang/String;\)I$
+
+# ===================================================================
+# [ADD] 네트워크/스토리지 경로 힌트(다운로드 매니저, 크로넷, ExoPlayer 캐시)
+# ===================================================================
+# DownloadManager: 외부 저장소 경로를 직접 구성
+re:^Landroid/app/DownloadManager\$Request;->setDestinationInExternalFilesDir\(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;\)Landroid/app/DownloadManager\$Request;$
+re:^Landroid/app/DownloadManager\$Request;->setDestinationInExternalPublicDir\(Ljava/lang/String;Ljava/lang/String;\)Landroid/app/DownloadManager\$Request;$
+re:^Landroid/app/DownloadManager\$Request;->setDestinationUri\(Landroid/net/Uri;\)Landroid/app/DownloadManager\$Request;$
+
+# Cronet: 캐시 스토리지 경로 지정
+re:^Lorg/chromium/net/CronetEngine\$Builder;->setStoragePath\(Ljava/lang/String;\)Lorg/chromium/net/CronetEngine\$Builder;$
+
+# ExoPlayer: 캐시 디렉터리 직접 지정
+re:^Lcom/google/android/exoplayer2/upstream/cache/SimpleCache;-><init>\(Ljava/io/File;Lcom/google/android/exoplayer2/upstream/cache/CacheEvictor;.*\)V$
+
+# ===================================================================
+# [ADD] 웹뷰/런타임 관련
+# ===================================================================
+# 멀티 프로세스/서픽스 환경에서 서브디렉터리 판별에 도움
+re:^Landroid/webkit/WebView;->getDataDirectorySuffix\(\)Ljava/lang/String;$
+# (웹뷰 디렉터리는 보통 getDir로 귀결되지만, suffix는 하위 폴더명 추정에 유용)
+
+# ===================================================================
+# [ADD] Uri/문자열 경로 처리 보강
+# ===================================================================
+re:^Landroid/net/Uri;->buildUpon\(\)Landroid/net/Uri\$Builder;$
+re:^Landroid/net/Uri\$Builder;->appendPath\(Ljava/lang/String;\)Landroid/net/Uri\$Builder;$
+re:^Landroid/net/Uri\$Builder;->build\(\)Landroid/net/Uri;$
+Ljava/lang/String;->substring\(II\)Ljava/lang/String;
+Ljava/lang/String;->replace\(Ljava/lang/CharSequence;Ljava/lang/CharSequence;\)Ljava/lang/String;
+
+# ===================================================================
+# [ADD] 라이브러리 캐시/DB 경로 힌트 (보강)
+# ===================================================================
+# Fresco 디스크 캐시
+re:^Lcom/facebook/cache/disk/DiskCacheConfig\$Builder;->setBaseDirectoryPath\(Ljava/io/File;\)Lcom/facebook/cache/disk/DiskCacheConfig\$Builder;$
+re:^Lcom/facebook/cache/disk/DiskCacheConfig\$Builder;->setBaseDirectoryName\(Ljava/lang/String;\)Lcom/facebook/cache/disk/DiskCacheConfig\$Builder;$
+
+# Glide: 내부/외부 캐시 팩토리 (이미 일부 매칭 있지만 누락 방지)
+re:^Lcom/bumptech/glide/load/engine/cache/InternalCacheDiskCacheFactory;-><init>\(Landroid/content/Context;.*\)V$
+re:^Lcom/bumptech/glide/load/engine/cache/ExternalCacheDiskCacheFactory;-><init>\(Landroid/content/Context;.*\)V$
+
+# OkHttp 캐시 디렉터리
+Lokhttp3/Cache;-><init>(Ljava/io/File;J)V
+Lokhttp3/Cache;->directory()Ljava/io/File;
+
+# Room DB 빌더(이름 추출은 dyn_methods에서 RET.hint로 처리)
+re:^Landroidx/room/Room;->databaseBuilder\(Landroid/content/Context;Ljava/lang/Class;Ljava/lang/String;\)Landroidx/room/RoomDatabase\$Builder;$

@@ -1,0 +1,171 @@
+# ===== UUID / Session-like tokens =====
+Ljava/util/UUID;->randomUUID()Ljava/util/UUID; <uuid>
+Ljava/util/UUID;->toString()Ljava/lang/String; <uuid>
+
+# ===== Time-based tokens =====
+re:^Ljava/lang/System;->(currentTimeMillis|nanoTime)\(\)J$ <timestamp>
+re:^Ljava/util/Calendar;->getInstance\((Ljava/util/Locale;|Ljava/util/TimeZone;Ljava/util/Locale;|Ljava/util/TimeZone;)?\)Ljava/util/Calendar;$ <timestamp>
+re:^Ljava/util/Calendar;->getTimeInMillis\(\)J$ <timestamp>
+re:^Ljava/util/Date;->(getTime)\(\)J$ <timestamp>
+Ljava/time/Clock;->millis()J <timestamp>
+
+# ===== Intent-derived tokens =====
+Landroid/content/Intent;->getAction()Ljava/lang/String; <intent>
+Landroid/content/Intent;->getDataString()Ljava/lang/String; <intent>
+Landroid/content/Intent;->getType()Ljava/lang/String; <intent>
+Landroid/content/Intent;->getPackage()Ljava/lang/String; <intent>
+Landroid/content/Intent;->getScheme()Ljava/lang/String; <intent>
+Landroid/content/Intent;->getSelector()Landroid/content/Intent; <intent>
+Landroid/content/Intent;->getComponent()Landroid/content/ComponentName; <intent>
+Landroid/content/Intent;->getCategories()Ljava/util/Set; <intent>
+Landroid/content/Intent;->getData()Landroid/net/Uri; <intent>
+Landroid/content/Intent;->getClipData()Landroid/content/ClipData; <intent>
+
+# 모든 get*Extra 계열(문자열/숫자/배열 등)을 한 번에 커버
+re:^Landroid/content/Intent;->get[A-Za-z0-9]+Extra\(.*\).*$ <intent>
+
+# ===== Bundle(보통 Intent extras를 경유) =====
+Landroid/os/Bundle;->getString(Ljava/lang/String;)Ljava/lang/String; <intent>
+re:^Landroid/os/Bundle;->get[A-Za-z0-9]+\(.*\).*$ <intent>
+
+# ===== Uri to string-ish =====
+Landroid/net/Uri;->toString()Ljava/lang/String; <intent>
+Landroid/net/Uri;->getPath()Ljava/lang/String; <intent>
+
+# ====== 경로 이어붙이는 애들 ======
+re:^L.+;->resolve\(Ljava/lang/String;\).+          <dynamic_subdir>
+re:^L.+;->child\(Ljava/lang/String;\).+            <dynamic_subdir>
+re:^L.+;->appendPath\(Ljava/lang/String;\).+       <dynamic_subdir>
+re:^L.+;->append\(Ljava/lang/String;\).+           <dynamic_subdir>
+
+# ====== 디렉터리/캐시 빌더 ======
+re:^L.+;->directory\(L.+;?\).+                     <dynamic_dir>
+re:^L.+;->setDirectory\(L.+;?\).+                  <dynamic_dir>
+re:^L.+;->setDiskCache\(L.+;?\).+                  <dynamic_dir>
+re:^L.+;->diskCache\(L.+;?\).+                     <dynamic_dir>
+
+# ====== 빌더 마무리 ======
+re:^L.+;->build\(\)L.+;                             <dynamic_obj>
+re:^L.+;->create\(\)L.+;                            <dynamic_obj>
+
+
+# UUID from string factories (optional)
+re:^Ljava/util/UUID;->fromString\(Ljava/lang/String;\)Ljava/util/UUID;$ <uuid>
+# Simple random numeric patterns (java.util.Random nextInt/nextLong)
+re:^Ljava/util/Random;->next(Int|Long)\(\)I$ <rand>
+
+re:^Ljava/text/SimpleDateFormat;->format\(Ljava/util/Date;\)Ljava/lang/String;$ <timestamp_str>
+
+
+# ===== AndroidX Room (DB name capture & emit) =====
+
+# 1) DB 이름 힌트 저장: ARG2 = name(String)
+^Landroidx/room/Room;->databaseBuilder\(Landroid/content/Context;Ljava/lang/Class;Ljava/lang/String;\)Landroidx/room/RoomDatabase\$Builder;$
+RET.hint=db_name:ARG2
+
+# 2) Builder 체이닝 보존: 다양한 옵션 호출 후에도 db_name을 유지
+re:^Landroidx/room/RoomDatabase\$Builder;->[A-Za-z0-9_]+\(.*\)Landroidx/room/RoomDatabase\$Builder;$
+RET.pass=db_name
+
+# 3) build() 시 실제 경로 방출 (databases + cache .lck)
+^Landroidx/room/RoomDatabase\$Builder;->build\(\)Landroidx/room/RoomDatabase;$
+
+# =========================
+# [추가] 문자열/경로 결합 공통
+# =========================
+# StringBuilder 체인 → 최종 문자열 토큰으로 수렴
+Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder; <str_build>
+Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;                 <str_build>
+Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;                 <str_build>
+Ljava/lang/StringBuilder;->toString()Ljava/lang/String;                       <str_build>
+
+# 포맷 문자열
+re:^Ljava/lang/String;->format\(Ljava/lang/String;.*\)Ljava/lang/String;$     <str_format>
+
+# =========================
+# [추가] java.io.File / Path 계열
+# =========================
+Ljava/io/File;-><init>(Ljava/lang/String;)V                                   <path_from_str>
+Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V                     <path_join>
+Ljava/io/File;->getAbsolutePath()Ljava/lang/String;                           <to_abs>
+Ljava/io/File;->getName()Ljava/lang/String;                                   <to_name>
+Ljava/io/File;->getParent()Ljava/lang/String;                                 <to_parent>
+
+# java.nio.file.Path (안드로이드 26+ 또는 일부 라이브러리 번들)
+re:^Ljava/nio/file/Path;->resolve\(Ljava/lang/String;\)Ljava/nio/file/Path;$  <dynamic_subdir>
+Ljava/nio/file/Path;->getFileName()Ljava/nio/file/Path;                       <to_name>
+Ljava/nio/file/Path;->toAbsolutePath()Ljava/nio/file/Path;                    <to_abs>
+
+# kotlin.io.Path / okio.Path 유사 (일부 앱은 셰이딩된 네임)
+re:^Lokio/Path;->resolve\(Ljava/lang/String;\)Lokio/Path;$                    <dynamic_subdir>
+Lokio/Path;->getName()Ljava/lang/String;                                      <to_name>
+
+# 흔한 셰이딩 Path (예: ru1/q0 같은 난독명)
+re:^L[^/]+/[A-Za-z0-9_$]{1,3};->resolve\(Ljava/lang/String;\)L[^;]+;$         <dynamic_subdir>
+re:^L[^/]+/[A-Za-z0-9_$]{1,3};->child\(Ljava/lang/String;\)L[^;]+;$           <dynamic_subdir>
+
+# =========================
+# [추가] Uri/Uri.Builder 확장
+# =========================
+Landroid/net/Uri$Builder;->appendPath(Ljava/lang/String;)Landroid/net/Uri$Builder; <dynamic_subdir>
+Landroid/net/Uri$Builder;->build()Landroid/net/Uri;                                <dynamic_obj>
+
+# =========================
+# [추가] 디스크 캐시/디렉터리 빌더 (라이브러리별 시그니처 보강)
+# =========================
+# Coil v2/v3 (패키지/난독명 다양성을 고려한 정규식)
+re:^Lcoil/.+/DiskCache\$Builder;->directory\(Ljava/io/File;\)Lcoil/.+/DiskCache\$Builder;$ <dynamic_dir>
+re:^Lcoil/.+/DiskCache\$Builder;->build\(\)Lcoil/.+/DiskCache;$                        <dynamic_obj>
+
+# 난독된 Coil (예: La0/a 가 Builder, La0/d 가 Cache 식)
+re:^L[a-z0-9]{1,3}/[a-z0-9]{1,3};->directory\(L[^;]+;\)L[a-z0-9]{1,3}/[a-z0-9]{1,3};$   <dynamic_dir>
+re:^L[a-z0-9]{1,3}/[a-z0-9]{1,3};->build\(\)L[a-z0-9]{1,3}/[a-z0-9]{1,3};$             <dynamic_obj>
+
+# Glide DiskLruCacheFactory (하위 디렉터리 인자 존재: subDir)
+re:^Lcom/bumptech/glide/load/engine/cache/DiskLruCacheFactory;-><init>\(Ljava/lang/String;J\)V$ <dynamic_dir>
+re:^Lcom/bumptech/glide/load/engine/cache/DiskLruCacheFactory;-><init>\(Ljava/lang/String;Ljava/lang/String;J\)V$ <dynamic_dir><dynamic_subdir>
+re:^Lcom/bumptech/glide/load/engine/cache/DiskLruCacheFactory;->build\(\)Lcom/bumptech/glide/load/engine/cache/DiskCache;$ <dynamic_obj>
+
+# OkHttp Cache (디렉터리 직접 지정)
+Lokhttp3/Cache;-><init>(Ljava/io/File;J)V                                      <dynamic_dir>
+Lokhttp3/Cache;->directory()Ljava/io/File;                                     <dynamic_dir>
+
+# Picasso (대개 OkHttp 기반이지만, 별도 캐시 디렉 지정 시 포착)
+re:^Lcom/squareup/picasso/.+;->(with|builder)\(.*\).*$                          <dynamic_obj>
+
+# =========================
+# [추가] 데이터베이스/SharedPreferences 경로 방출
+# =========================
+# Room: 이미 db_name 힌트/전달 규칙이 있으므로 build()에서 실제 경로 방출
+^Landroidx/room/RoomDatabase\$Builder;->build\(\)Landroidx/room/RoomDatabase;$
+RET.emit=/data/user/0/<pkg>/databases/${db_name}
+RET.emit=/data/user/0/<pkg>/databases/${db_name}-journal
+RET.emit=/data/user/0/<pkg>/databases/${db_name}-wal
+RET.emit=/data/user/0/<pkg>/databases/${db_name}-shm
+RET.emit=/data/user/0/<pkg>/databases/${db_name}.lck
+
+# SQLiteDatabase: 문자열 경로로 직접 오픈하는 경우
+re:^Landroid/database/sqlite/SQLiteDatabase;->openDatabase\(Ljava/lang/String;.*\)Landroid/database/sqlite/SQLiteDatabase;$ <path_from_str>
+
+# SharedPreferences: 이름 기반 xml 파일 경로
+Landroid/content/Context;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
+RET.emit=/data/user/0/<pkg>/shared_prefs/${ARG0}.xml
+
+# =========================
+# [추가] 인텐트/번들/클립데이터 보강 (이미 있으나 누락 메서드 추가)
+# =========================
+Landroid/content/Intent;->getData()Landroid/net/Uri;                           <intent>
+Landroid/content/ClipData;->getItemAt(I)Landroid/content/ClipData$Item;        <intent>
+Landroid/content/ClipData$Item;->getUri()Landroid/net/Uri;                     <intent>
+Landroid/content/ClipData$Item;->coerceToText(Landroid/content/Context;)Ljava/lang/CharSequence; <intent>
+
+# =========================
+# [추가] 시간/랜덤 토큰 보강
+# =========================
+Ljava/util/Random;->nextInt()I                                                 <rand>
+Ljava/util/Random;->nextLong()J                                                <rand>
+re:^Ljava/time/Instant;->now\(\)Ljava/time/Instant;$                           <timestamp>
+re:^Ljava/time/Instant;->toEpochMilli\(\)J$                                    <timestamp>
+
+
+
